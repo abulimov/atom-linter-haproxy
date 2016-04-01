@@ -1,0 +1,29 @@
+{
+  "name": "linter-haproxy",
+  "main": "./lib/main",
+  "version": "0.0.0",
+  "description": "Linter for HAProxy config",
+  "keywords": [
+    "haproxy",
+    "linter"
+  ],
+  "repository": "https://github.com/abulimov/atom-linter-haproxy",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "dependencies": {
+    "atom-linter": "^4.6.1",
+    "atom-package-deps": "^4.0.1"
+  },
+  "package-deps": [
+    "linter"
+  ],
+  "providedServices": {
+    "linter": {
+      "versions": {
+        "1.0.0": "provideLinter"
+      }
+    }
+  }
+}
