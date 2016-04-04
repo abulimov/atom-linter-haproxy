@@ -39,7 +39,10 @@ module.exports =
               linter_result += data
             exit: (code) ->
               try
-                parsed = JSON.parse(linter_result)
+                if linter_result != ""
+                  parsed = JSON.parse(linter_result)
+                else
+                  parsed = []
               catch error
                 atom.notifications.addError "Failed to parse output from haproxy-lint",
                   detail: "#{error.message}"
