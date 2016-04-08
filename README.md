@@ -8,4 +8,6 @@ This package will lint your opened HAProxy configs in Atom, using [haproxy-lint]
 * `$ apm install linter-haproxy`
 
 ## Configuration
+
 * **Executable** Path to your haproxy-lint executable. This is useful if haproxy-lint is not in $PATH.
+* **Args** Arguments to run haproxy-lint, default is `--json`. Useful to enable or disable linter options.
