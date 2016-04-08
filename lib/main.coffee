@@ -5,14 +5,21 @@ module.exports =
   config:
     executablePath:
       type: 'string'
-      title: 'haproxy-linter Executable Path'
+      title: 'haproxy-linter executable path'
       default: 'haproxy-lint'
+    executableArgs:
+      type: 'string'
+      title: 'haproxy-linter arguments as comma-separated list'
+      default: '--json'
   activate: ->
     require('atom-package-deps').install('linter-haproxy')
     @subscriptions = new CompositeDisposable
     @subscriptions.add atom.config.observe 'linter-haproxy.executablePath',
       (executablePath) =>
         @executablePath = executablePath
+    @subscriptions.add atom.config.observe 'linter-haproxy.executableArgs',
+      (executableArgs) =>
+        @executableArgs = executableArgs
   deactivate: ->
     @subscriptions.dispose()
   provideLinter: ->
@@ -26,7 +33,7 @@ module.exports =
           project_path = atom.project.getPaths()
 
           linter_result = ""
-          linter_args = ["--json"]
+          linter_args = @executableArgs.split(/,?\s+/)
           linter_args.push filePath
 
           error_stack = []
@@ -43,17 +50,16 @@ module.exports =
                   parsed = JSON.parse(linter_result)
                 else
                   parsed = []
+                for error in parsed
+                  error_stack.push
+                    type: if error.severity == "warning" then "Warning" else "Error"
+                    text: error.message
+                    filePath: filePath
+                    range: helpers.rangeFromLineNumber(textEditor, error.line - 1)
               catch error
                 atom.notifications.addError "Failed to parse output from haproxy-lint",
-                  detail: "#{error.message}"
+                  detail: "#{error.message} while parsing JSON: '#{linter_result}'"
                   dismissable: true
-              for error in parsed
-                console.log "#{error.line}"
-                error_stack.push
-                  type: if error.severity == "warning" then "Warning" else "Error"
-                  text: error.message
-                  filePath: filePath
-                  range: helpers.rangeFromLineNumber(textEditor, error.line - 1)
               resolve error_stack
           process.onWillThrowError ({error,handle}) ->
             atom.notifications.addError "Failed to run #{@executablePath}",
